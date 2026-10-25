@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="L-Mobile">
 <meta name="theme-color" content="#1b2024">
+<meta name="color-scheme" content="light dark">
 <title>L-Mobile Codes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
@@ -21,8 +22,8 @@
 window.LM_GOOGLE_CLIENT_ID='548865061894-uchu95p8c2bv9k2n9eis8ep9qov2e786.apps.googleusercontent.com';
 </script>
 <style>
-:root{--dark:#1b2024;--gold:#ffcd11;--bg:#f2f4f5;--line:#e3e7e9;--text:#14181b;--muted:#79828a;--surface:#ffffff;--surface2:#f7f9f9;--surface3:#f1f4f5;--input-border:#b2babf;--radius:3px;--shadow:0 1px 2px rgba(16,22,26,.05);--warnBg:#fff7e0;--warnLine:#f0c64a;--warnText:#7a5600;--ok:#1f8a4c;--bad:#d94747}
-[data-theme="dark"]{--dark:#0d1012;--gold:#ffcd11;--bg:#14171a;--line:#2c333a;--text:#eceef0;--muted:#7f888f;--surface:#1e2329;--surface2:#242a30;--surface3:#242a30;--input-border:#4c555d;--shadow:0 1px 2px rgba(0,0,0,.4);--warnBg:#2f2810;--warnLine:#8a6d14;--warnText:#f3d77a}
+:root{color-scheme:light;--dark:#1b2024;--gold:#ffcd11;--bg:#f2f4f5;--line:#e3e7e9;--text:#14181b;--muted:#79828a;--surface:#ffffff;--surface2:#f7f9f9;--surface3:#f1f4f5;--input-border:#b2babf;--radius:3px;--shadow:0 1px 2px rgba(16,22,26,.05);--warnBg:#fff7e0;--warnLine:#f0c64a;--warnText:#7a5600;--ok:#1f8a4c;--bad:#d94747}
+[data-theme="dark"]{color-scheme:dark;--dark:#0d1012;--gold:#ffcd11;--bg:#14171a;--line:#2c333a;--text:#eceef0;--muted:#7f888f;--surface:#1e2329;--surface2:#242a30;--surface3:#242a30;--input-border:#4c555d;--shadow:0 1px 2px rgba(0,0,0,.4);--warnBg:#2f2810;--warnLine:#8a6d14;--warnText:#f3d77a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:'IBM Plex Sans','Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
 .hidden{display:none!important}
@@ -66,17 +67,20 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
 /* nächster Code */
 .nextCard{border:2px solid var(--gold);background:linear-gradient(180deg,rgba(255,205,17,.10),var(--surface) 60%)}
 .nextCode{font-family:'IBM Plex Mono',monospace;font-size:clamp(26px,7vw,40px);font-weight:600;letter-spacing:.08em;text-align:center;padding:10px 0 4px;word-break:break-all;user-select:all}
-.nextLink{text-align:center;font-size:12px;color:var(--muted);word-break:break-all;margin-bottom:12px}
+.nextLink{text-align:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:12px}
 .btnRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .btnRow button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;font-size:12.5px}
 .btnRow button .bi{font-size:19px}
 /* Niederlassungen */
 .nlBars{display:flex;flex-direction:column;gap:8px}
-.nlBar{display:grid;grid-template-columns:92px 1fr 64px;gap:10px;align-items:center;font-size:13px}
+.nlBar{display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;font-size:13px}
 .nlBar .tr{height:10px;background:var(--surface3);border-radius:6px;overflow:hidden}
 .nlBar .tr i{display:block;height:100%;background:var(--dark);border-radius:6px}
 [data-theme="dark"] .nlBar .tr i{background:var(--gold)}
-.nlBar .nv{text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12.5px}
+[data-theme="dark"] .seg button.on,[data-theme="dark"] .chips button.on{background:var(--gold);color:#1a1300;border-color:var(--gold)}
+[data-theme="dark"] .row.used .dot{background:#5d666e}
+.nlBar .nv{text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12.5px;white-space:nowrap;min-width:84px}
+.nlBar .nv small{color:var(--muted);font-weight:500;margin-left:6px}
 /* Liste */
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .filters .fIn{flex:1 1 220px;width:auto}
@@ -85,7 +89,8 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
 .seg button{border:0;background:var(--surface);padding:10px 12px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
 .seg button.on{background:var(--dark);color:#fff}
 .list{display:flex;flex-direction:column}
-.row{display:grid;grid-template-columns:14px 160px 1fr 120px 96px auto;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid var(--line);font-size:13.5px}
+.row{display:grid;grid-template-columns:14px 160px 1fr 120px 96px auto;gap:12px;align-items:center;padding:11px 6px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer}
+.row:hover{background:var(--surface2)}
 .row:last-child{border-bottom:0}
 .row .dot{width:10px;height:10px;border-radius:50%;background:var(--ok)}
 .row.used .dot{background:#b5bcc2}
@@ -117,6 +122,9 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
 .secT{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;margin:18px 0 8px}
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line)}
 .kv b{font-family:'IBM Plex Mono',monospace}
+.actList{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.actList button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;font-size:15px}
+.actList button .ai{font-size:18px;width:24px;text-align:center}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--dark);color:#fff;padding:11px 16px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:80;max-width:min(92vw,520px);box-shadow:0 8px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.show{opacity:1}.toast.bad{background:var(--bad)}
 @media(max-width:760px){
@@ -124,12 +132,15 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
  .brand-logo,.hideM{display:none}
  .kpis{grid-template-columns:repeat(3,1fr);gap:8px}
  .kpi{padding:10px}.kpi .kV{font-size:21px}
- .row{grid-template-columns:12px 1fr auto;grid-template-areas:"d c a" "d w a";row-gap:2px;padding:12px 4px}
+ .row{grid-template-columns:12px 1fr auto auto;grid-template-areas:"d c t a" "d w w a";column-gap:10px;row-gap:3px;padding:12px 2px}
  .row .dot{grid-area:d}.row .code{grid-area:c;font-size:14.5px}.row .act{grid-area:a}
+ .row .dt{grid-area:t;font-size:11.5px;text-align:right}
  .row .who{grid-area:w;font-size:12.5px;color:var(--muted)}
- .row .nl,.row .dt{display:none}
+ .row .nl{display:none}
+ .filters .fIn[type=search]{flex:1 1 100%}
+ .filters .seg{flex:0 0 auto}.filters .seg button{padding:10px 11px}
+ .filters select.fIn{flex:1 1 0;min-width:0;width:auto}
  .row .who .meta{display:inline}
- .filters select.fIn{flex:1 1 140px}
 }
 @media(min-width:761px){.row .who .meta{display:none}}
 </style>
@@ -201,6 +212,12 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
   </div>
 </div></div>
 
+<!-- Aktionen zu einem Code -->
+<div class="drawer" id="dlgAct"><div class="modal">
+  <div class="mHead"><div><div class="mono" style="font-size:22px;font-weight:600;letter-spacing:.06em" id="aCode"></div><div class="hint" style="margin-top:4px" id="aInfo"></div></div><button class="xBtn" onclick="closeDlg('dlgAct')">✕</button></div>
+  <div class="actList" id="aBtns"></div>
+</div></div>
+
 <!-- Einstellungen -->
 <div class="drawer" id="dlgSet"><div class="modal">
   <div class="mHead"><h3>⚙️ Einstellungen</h3><button class="xBtn" onclick="closeDlg('dlgSet')">✕</button></div>
@@ -248,7 +265,8 @@ function closeDlg(id){gid(id).classList.remove('show')}
 document.querySelectorAll('.drawer').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.classList.remove('show')}));
 const _sl={};function loadScriptOnce(src){if(_sl[src])return _sl[src];_sl[src]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.async=true;s.onload=()=>res();s.onerror=()=>{delete _sl[src];rej(new Error('Skript konnte nicht geladen werden (Internet?)'))};document.head.appendChild(s)});return _sl[src]}
 function toggleTheme(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',d?'light':'dark');try{localStorage.setItem('lm_theme',d?'light':'dark')}catch(e){}}
-try{if(localStorage.getItem('lm_theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}
+/* Dunkelmodus: eigene Wahl, sonst Einstellung des Geräts übernehmen */
+try{const t=localStorage.getItem('lm_theme');if(t==='dark'||(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.setAttribute('data-theme','dark')}catch(e){}
 if(location.protocol!=='file:')gid('homeBtn').classList.add('hidden');   // gehostet: kein Link zur lokalen Tool-Übersicht
 
 const NLS=['Frankfurt','Viernheim','Mellingen','Fritzlar','Zentrale'];
@@ -292,20 +310,20 @@ let l=allCodes().filter(c=>(!ST||(ST==='free'?!c.used:c.used))&&(!nl||c.nl===nl)
 l.sort((a,b)=>(b.used-a.used)||(a.used?String(b.date||'').localeCompare(String(a.date||''))||String(b.updatedAt).localeCompare(String(a.updatedAt)):(a.order||0)-(b.order||0)));
 gid('listInfo').textContent=fmtNum(l.length)+' von '+fmtNum(allCodes().length);
 const show=l.slice(0,LIMIT);
-gid('list').innerHTML=show.length?show.map(c=>'<div class="row'+(c.used?' used':'')+'">'+
+gid('list').innerHTML=show.length?show.map(c=>'<div class="row'+(c.used?' used':'')+'" onclick="openAct(\''+c.code+'\')">'+
 '<span class="dot" title="'+(c.used?'vergeben':'frei')+'"></span>'+
 '<span class="code">'+esc(c.code)+'</span>'+
-'<span class="who">'+(c.used?esc(c.user||'–')+'<span class="meta">'+(c.nl?' · '+esc(c.nl):'')+(c.date?' · '+fmtDate(c.date):'')+'</span>':'<span class="free">frei</span>')+(c.note?' <span style="color:var(--muted)">· '+esc(c.note)+'</span>':'')+'</span>'+
+'<span class="who">'+(c.used?esc(c.user||'–')+'<span class="meta">'+(c.nl?' · '+esc(c.nl):'')+'</span>':'<span class="free">frei</span>')+(c.note?' <span style="color:var(--muted)">· '+esc(c.note)+'</span>':'')+'</span>'+
 '<span class="nl">'+esc(c.nl||'')+'</span><span class="dt">'+fmtDate(c.date)+'</span>'+
-'<span class="act"><button class="iconBtn" title="Code kopieren" onclick="copyText(\''+c.code+'\',\'Code kopiert\')">📋</button><button class="iconBtn" title="Teilen" onclick="shareCode(\''+c.code+'\')">📤</button><button class="iconBtn" title="'+(c.used?'Bearbeiten':'Vergeben')+'" onclick="openEdit(\''+c.code+'\')">'+(c.used?'✏️':'✓')+'</button></span></div>').join(''):'<div class="empty">'+(allCodes().length?'Keine Treffer.':'Noch keine Codes – unter ⚙️ die Excel importieren oder Codes einfügen.')+'</div>';
+'<span class="act" onclick="event.stopPropagation()"><button class="iconBtn" title="Code kopieren" onclick="copyText(\''+c.code+'\',\'Code kopiert\')">📋</button><button class="iconBtn hideM" title="Teilen" onclick="shareCode(\''+c.code+'\')">📤</button><button class="iconBtn hideM" title="'+(c.used?'Bearbeiten':'Vergeben')+'" onclick="openEdit(\''+c.code+'\')">'+(c.used?'✏️':'✓')+'</button></span></div>').join(''):'<div class="empty">'+(allCodes().length?'Keine Treffer.':'Noch keine Codes – unter ⚙️ die Excel importieren oder Codes einfügen.')+'</div>';
 gid('more').innerHTML=l.length>show.length?'<button class="ghost" onclick="LIMIT+=200;renderList()">Weitere '+fmtNum(l.length-show.length)+' anzeigen</button>':'';
 }
 function renderNl(){
 const used=allCodes().filter(c=>c.used),cnt={};used.forEach(c=>{const k=c.nl||'ohne';cnt[k]=(cnt[k]||0)+1});
 const keys=NLS.concat(Object.keys(cnt).filter(k=>!NLS.includes(k))),max=Math.max(1,...keys.map(k=>cnt[k]||0));
 gid('nlSub').textContent=fmtNum(used.length)+' vergeben';
-gid('nlBars').innerHTML=keys.filter(k=>cnt[k]||NLS.includes(k)).map(k=>'<div class="nlBar"><span>'+esc(k)+'</span><span class="tr"><i style="width:'+((cnt[k]||0)/max*100)+'%"></i></span><span class="nv">'+(cnt[k]||0)+' · '+(used.length?fmtNum((cnt[k]||0)/used.length*100):0)+' %</span></div>').join('');
-const sel=gid('fNl'),cur=sel.value;sel.innerHTML='<option value="">Alle Niederlassungen</option>'+keys.filter(k=>k!=='ohne').map(k=>'<option'+(k===cur?' selected':'')+'>'+esc(k)+'</option>').join('');
+gid('nlBars').innerHTML=keys.filter(k=>cnt[k]||NLS.includes(k)).map(k=>'<div class="nlBar"><span>'+esc(k)+'</span><span class="tr"><i style="width:'+((cnt[k]||0)/max*100)+'%"></i></span><span class="nv">'+(cnt[k]||0)+'<small>'+(used.length?fmtNum((cnt[k]||0)/used.length*100):0)+' %</small></span></div>').join('');
+const sel=gid('fNl'),cur=sel.value;sel.innerHTML='<option value="">📍 Alle</option>'+keys.filter(k=>k!=='ohne').map(k=>'<option value="'+esc(k)+'"'+(k===cur?' selected':'')+'>📍 '+esc(k)+'</option>').join('');
 }
 gid('segSt').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ST=b.dataset.v;gid('segSt').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));LIMIT=60;renderList()}));
 
@@ -331,6 +349,18 @@ ENL=c.used?(c.nl||''):'';renderNlChips();
 gid('eFree').classList.toggle('hidden',!c.used);
 gid('eShareBtn').textContent=c.used?'📤 Teilen':'✓ Vergeben & teilen';
 openDlg('dlgEdit');if(!c.used)setTimeout(()=>gid('eUser').focus(),80);
+}
+function openAct(code){
+const c=DB.codes[code];if(!c)return;
+gid('aCode').textContent=code;
+gid('aInfo').innerHTML=c.used?'Vergeben an <b>'+esc(c.user||'–')+'</b>'+(c.nl?' · '+esc(c.nl):'')+(c.date?' · '+fmtDate(c.date):'')+(c.note?'<br>'+esc(c.note):''):'<span style="color:var(--ok);font-weight:700">frei</span>';
+const b=(icon,txt,fn,cls)=>'<button class="'+(cls||'ghost')+'" onclick="'+fn+'"><span class="ai">'+icon+'</span>'+txt+'</button>';
+gid('aBtns').innerHTML=(c.used?b('✏️','Vergabe bearbeiten',"closeDlg('dlgAct');openEdit('"+code+"')"):b('✓','Diesen Code vergeben',"closeDlg('dlgAct');openEdit('"+code+"')",'primary'))+
+b('📋','Code kopieren',"copyText('"+code+"','Code kopiert');closeDlg('dlgAct')")+
+b('🔗','Einlöse-Link kopieren',"copyText(linkOf('"+code+"'),'Link kopiert');closeDlg('dlgAct')")+
+b('📤','Teilen (Teams, WhatsApp, Mail …)',"shareCode('"+code+"');closeDlg('dlgAct')")+
+(c.used?b('↩️','Wieder freigeben',"closeDlg('dlgAct');EDIT='"+code+"';releaseCode()",'danger'):'');
+openDlg('dlgAct');
 }
 function renderNlChips(){gid('eNl').innerHTML=NLS.map(n=>'<button type="button" class="'+(n===ENL?'on':'')+'" onclick="ENL=\''+n+'\';renderNlChips()">'+n+'</button>').join('')}
 function saveEdit(share){
