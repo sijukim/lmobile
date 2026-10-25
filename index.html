@@ -132,6 +132,10 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
 .monN{font-weight:700;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .monN small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
 .monSel{padding:8px 8px;font-size:13px}
+.tplBar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.tplBar button{border:1px solid var(--input-border);background:var(--surface2);color:var(--text);border-radius:8px;padding:6px 9px;font-size:12px;font-family:'IBM Plex Mono',monospace;cursor:pointer}
+.tplPrev{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface2);font-size:14px;line-height:1.5;min-height:80px}
+.tplPrev .tpS{font-weight:800;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:8px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--dark);color:#fff;padding:11px 16px;border-radius:12px;font-size:13.5px;font-weight:600;z-index:80;max-width:min(92vw,520px);box-shadow:0 8px 30px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.show{opacity:1}.toast.bad{background:var(--bad)}
 @media(max-width:760px){
@@ -253,6 +257,25 @@ label.fl{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:
   </div>
   <p class="hint">Die Codes liegen als Datei „<span class="mono" id="sFile"></span>" in deinem Google Drive. Das Tool sieht nur diese eine Datei – nicht dein übriges Drive.</p>
 
+  <div class="secT">Nachricht an Monteure</div>
+  <label class="fl" for="tSubj">Betreff</label>
+  <input class="fIn" id="tSubj" oninput="tplPreview()">
+  <label class="fl" for="tBody">Text</label>
+  <div class="tplBar">
+    <button type="button" onclick="tplWrap()" title="Markierten Text fett"><b>B</b> fett</button>
+    <button type="button" onclick="tplIns('{Vorname}')">{Vorname}</button>
+    <button type="button" onclick="tplIns('{Name}')">{Name}</button>
+    <button type="button" onclick="tplIns('{Code}')">{Code}</button>
+    <button type="button" onclick="tplIns('{Link}')">{Link}</button>
+    <button type="button" onclick="tplIns('{Niederlassung}')">{Niederlassung}</button>
+    <button type="button" onclick="tplIns('{Datum}')">{Datum}</button>
+  </div>
+  <textarea class="fIn" id="tBody" rows="7" oninput="tplPreview()" style="font-family:inherit;font-size:14px"></textarea>
+  <label class="fl">Vorschau</label>
+  <div class="tplPrev" id="tPrev"></div>
+  <div class="btns" style="margin-top:10px"><button class="ghost" onclick="tplReset()">Standard</button><button class="primary" onclick="tplSave()">💾 Nachricht speichern</button></div>
+  <p class="hint">Text markieren und <b>B</b> tippen = fett (wird als **Text** angezeigt). Fettschrift bleibt erhalten bei „📝 Nachricht kopieren" und dann Einfügen in Outlook, Teams oder Mail. Über das Teilen-Menü (WhatsApp, SMS) wird der Text ohne Formatierung gesendet.</p>
+
   <div class="secT">Codes hinzufügen</div>
   <textarea class="fIn" id="sAdd" placeholder="Neue Codes oder Einlöse-Links einfügen – einer pro Zeile"></textarea>
   <div class="btns" style="justify-content:flex-start;margin-top:8px"><button class="ghost" onclick="addCodes()">➕ Codes hinzufügen</button></div>
@@ -352,13 +375,41 @@ gid('segSt').querySelectorAll('button').forEach(b=>b.addEventListener('click',()
 function copyText(t,msg){if(!t)return;
 const fb=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(msg||'Kopiert')}catch(e){toast('Kopieren nicht möglich',true)}ta.remove()};
 if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(()=>toast(msg||'Kopiert'),fb);else fb()}
-/* Nachricht an den Monteur – Anrede mit Vornamen (bei freiem Code ohne Namen) */
+/* Nachricht an den Monteur – Vorlage unter ⚙️ frei bearbeitbar (wird mit synchronisiert).
+   Platzhalter: {Vorname} {Name} {Code} {Link} {Niederlassung} {Datum} – **Text** = fett */
+const TPL_DEFAULT={subject:'L-Mobile Code',body:'Hi {Vorname},\n\nhier der Code für L-Mobile:\n**{Code}**\n\nVG Si Ju'};
+function tpl(){const t=DB.settings||{};return {subject:t.subject!=null?t.subject:TPL_DEFAULT.subject,body:t.body!=null?t.body:TPL_DEFAULT.body}}
 function firstName(n){return String(n||'').trim().split(/\s+/)[0]||''}
-function shareText(code){const c=DB.codes[code],v=c&&c.used?firstName(c.user):'';
-return 'Hi'+(v?' '+v:'')+',\n\nhier der Code für L-Mobile:\n'+code+'\n\nVG Si Ju'}
+function fillTpl(body,c,code){
+const used=c&&c.used,v={Vorname:used?firstName(c.user):'',Name:used?String(c.user||'').trim():'',Code:code,Link:linkOf(code),Niederlassung:used?(c.nl||''):'',Datum:used&&c.date?fmtDate(c.date):''};
+return String(body).replace(/ ?\{(\w+)\}/g,(m,k)=>{if(!(k in v))return m;const val=v[k];return val?(m.charAt(0)===' '?' ':'')+val:''})}
+function msgOf(code){const c=DB.codes[code];return fillTpl(tpl().body,c,code)}
+function toPlain(s){return String(s).replace(/\*\*([\s\S]+?)\*\*/g,'$1')}
+function toHtml(s){return esc(s).replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}
+function shareText(code){return toPlain(msgOf(code))}
+/* formatiert kopieren: in Outlook / Teams / Mail bleibt Fettschrift erhalten */
+function copyRich(md,msg){
+const html='<div style="font-family:Calibri,Arial,sans-serif;font-size:11pt">'+toHtml(md)+'</div>',plain=toPlain(md);
+const fb=()=>{const d=document.createElement('div');d.innerHTML=html;d.style.cssText='position:fixed;left:-9999px;top:0;white-space:normal';document.body.appendChild(d);
+const r=document.createRange();r.selectNodeContents(d);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
+let ok=false;try{ok=document.execCommand('copy')}catch(e){}sel.removeAllRanges();d.remove();ok?toast(msg||'Nachricht kopiert'):copyText(plain,msg)};
+if(navigator.clipboard&&window.ClipboardItem&&window.isSecureContext){
+navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]).then(()=>toast(msg||'Nachricht kopiert'),fb)}
+else fb()}
+function copyMsg(code){if(code)copyRich(msgOf(code),'Nachricht kopiert – in Outlook/Teams einfügen (Fettschrift bleibt erhalten)')}
 function shareCode(code){if(!code)return;
-if(navigator.share){navigator.share({title:'L-Mobile Code',text:shareText(code)}).catch(()=>{})}
-else copyText(shareText(code),'Nachricht kopiert – in Outlook/Teams einfügen')}
+if(navigator.share){navigator.share({title:tpl().subject||'L-Mobile Code',text:shareText(code)}).catch(()=>{})}
+else copyMsg(code)}
+/* ---------- Vorlage bearbeiten (Einstellungen) ---------- */
+function tplSample(){const c=allCodes().filter(x=>x.used&&x.user).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];return c||{code:'ABCD1234EFGH',used:true,user:'Max Mustermann',nl:'Frankfurt',date:todayIso()}}
+function tplLoad(){const t=tpl();gid('tSubj').value=t.subject;gid('tBody').value=t.body;tplPreview()}
+function tplPreview(){const c=tplSample();gid('tPrev').innerHTML='<div class="tpS">'+esc(gid('tSubj').value||'(ohne Betreff)')+'</div>'+toHtml(fillTpl(gid('tBody').value,c,c.code))}
+function tplWrap(){const ta=gid('tBody'),a=ta.selectionStart,b=ta.selectionEnd,v=ta.value;
+if(a===b){ta.setRangeText('**fett**',a,b,'select');ta.setSelectionRange(a+2,a+6)}else ta.setRangeText('**'+v.slice(a,b)+'**',a,b,'end');
+ta.focus();tplPreview()}
+function tplIns(ph){const ta=gid('tBody');ta.setRangeText(ph,ta.selectionStart,ta.selectionEnd,'end');ta.focus();tplPreview()}
+function tplSave(){DB.settings=Object.assign({},DB.settings||{},{subject:gid('tSubj').value,body:gid('tBody').value,updatedAt:nowIso()});DB.updatedAt=DB.settings.updatedAt;saveLocal(true);scheduleSync();toast('Nachricht gespeichert – gilt auf allen Geräten')}
+function tplReset(){if(!confirm('Vorlage auf den Standardtext zurücksetzen?'))return;gid('tSubj').value=TPL_DEFAULT.subject;gid('tBody').value=TPL_DEFAULT.body;tplPreview()}
 
 /* ============================= MONTEURE ============================= */
 function monKey(n){return String(n||'').trim().toLowerCase().replace(/\s+/g,' ')}
@@ -428,7 +479,8 @@ const b=(icon,txt,fn,cls)=>'<button class="'+(cls||'ghost')+'" onclick="'+fn+'">
 gid('aBtns').innerHTML=(c.used?b('✏️','Vergabe bearbeiten',"closeDlg('dlgAct');openEdit('"+code+"')"):b('✓','Diesen Code vergeben',"closeDlg('dlgAct');openEdit('"+code+"')",'primary'))+
 b('📋','Code kopieren',"copyText('"+code+"','Code kopiert');closeDlg('dlgAct')")+
 b('🔗','Einlöse-Link kopieren',"copyText(linkOf('"+code+"'),'Link kopiert');closeDlg('dlgAct')")+
-b('📤','Teilen (Teams, WhatsApp, Mail …)',"shareCode('"+code+"');closeDlg('dlgAct')")+
+b('📤','Teilen (WhatsApp, SMS, Mail …)',"shareCode('"+code+"');closeDlg('dlgAct')")+
+b('📝','Nachricht kopieren – mit Fettschrift (Outlook, Teams)',"copyMsg('"+code+"');closeDlg('dlgAct')")+
 (c.used?b('↩️','Wieder freigeben',"closeDlg('dlgAct');EDIT='"+code+"';releaseCode()",'danger'):'');
 openDlg('dlgAct');
 }
@@ -568,10 +620,11 @@ const STORE=GDriveStore;
 /* pro Eintrag gewinnt die neuere Änderung – gilt für Codes und Monteure */
 function mergeMap(x,y){const out={};new Set(Object.keys(x||{}).concat(Object.keys(y||{}))).forEach(k=>{const p=x&&x[k],q=y&&y[k];out[k]=!p?q:!q?p:(String(q.updatedAt||'')>String(p.updatedAt||'')?q:p)});return out}
 function mergeDB(a,b){
-return {codes:mergeMap(a&&a.codes,b&&b.codes),monteure:mergeMap(a&&a.monteure,b&&b.monteure),
+const sa=a&&a.settings,sb=b&&b.settings;
+return {codes:mergeMap(a&&a.codes,b&&b.codes),monteure:mergeMap(a&&a.monteure,b&&b.monteure),settings:!sa?sb:!sb?sa:(String(sb.updatedAt||'')>String(sa.updatedAt||'')?sb:sa),
 updatedAt:[a&&a.updatedAt,b&&b.updatedAt].filter(Boolean).sort().pop()||''}}
 function sameMap(x,y){x=x||{};y=y||{};const ka=Object.keys(x),kb=Object.keys(y);return ka.length===kb.length&&ka.every(k=>y[k]&&y[k].updatedAt===x[k].updatedAt)}
-function sameDB(a,b){if(!a||!b)return false;return sameMap(a.codes,b.codes)&&sameMap(a.monteure,b.monteure)}
+function sameDB(a,b){if(!a||!b)return false;return sameMap(a.codes,b.codes)&&sameMap(a.monteure,b.monteure)&&((a.settings&&a.settings.updatedAt)||'')===((b.settings&&b.settings.updatedAt)||'')}
 let SYNCING=false,SYNC_AGAIN=false,SYNC_T=null,LAST_SYNC=0;
 function setSync(st,txt){const p=gid('syncPill');p.className='iconGhostBtn syncPill '+st;gid('syncTxt').textContent=txt;renderSetup()}
 function scheduleSync(){clearTimeout(SYNC_T);if(STORE.configured()&&STORE.hasToken())SYNC_T=setTimeout(syncNow,700);else setSync(STORE.configured()?'login':'',STORE.configured()?'Anmelden':'nur lokal')}
@@ -609,6 +662,7 @@ else if(!STORE.hasToken())b.innerHTML='<div class="banner info"><span class="bIc
 else b.innerHTML='';
 }
 function openSettings(){
+tplLoad();
 gid('sClient').value=STORE.clientId();gid('sClient').disabled=!!String(window.LM_GOOGLE_CLIENT_ID||'').trim();
 gid('sFile').textContent=STORE.FILE;
 gid('syncInfo').innerHTML='<div class="kv"><span>Status</span><b>'+(!STORE.configured()?'nicht eingerichtet':STORE.hasToken()?'verbunden':'nicht angemeldet')+'</b></div>'+
